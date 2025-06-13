@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Guard Dashboard - {{ user.username }}{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Guard Dashboard - {{ user.username }}</h1>
+<div class="mb-6">
+    <h2 class="text-xl font-semibold">Current Time</h2>
+    <p id="clock" class="text-lg"></p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg card">
+        <h2 class="text-xl font-semibold mb-4">Mark Attendance</h2>
+        {% if not attendance or not attendance.time_in %}
+            <form id="timeInForm" method="POST" action="{{ url_for('mark_attendance') }}">
+                <input type="hidden" name="photo">
+                <input type="hidden" name="time_in" value="1">
+                <button type="button" onclick="capturePhoto('timeInForm')" class="btn-primary w-full p-3 rounded text-white font-semibold">Mark Time In</button>
+            </form>
+        {% elif not attendance.time_out %}
+            <form id="timeOutForm" method="POST" action="{{ url_for('mark_attendance') }}">
+                <input type="hidden" name="photo">
+                <button type="button" onclick="capturePhoto('timeOutForm')" class="btn-primary w-full p-3 rounded text-white font-semibold">Mark Time Out</button>
+            </form>
+        {% else %}
+            <p class="text-green-600">Attendance marked for today.</p>
+        {% endif %}
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg card">
+        <h2 class="text-xl font-semibold mb-4">Submit Hourly Photo</h2>
+        <form id="hourlyCheckForm" method="POST" action="{{ url_for('hourly_check') }}">
+            <input type="hidden" name="photo">
+            <button type="button" onclick="capturePhoto('hourlyCheckForm')" class="btn-primary w-full p-3 rounded text-white font-semibold">Submit Hourly Photo</button>
+        </form>
+    </div>
+</div>
+<h2 class="text-xl font-semibold mt-6">Attendance History (Last 30 Days)</h2>
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg card mt-4">
+    {% if past_attendances %}
+        <table class="w-full text-left">
+            <thead>
+                <tr class="border-b dark:border-gray-700">
+                    <th class="py-2">Date</th>
+                    <th class="py-2">Time In</th>
+                    <th class="py-2">Time Out</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in past_attendances %}
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="py-2">{{ att.date }}</td>
+                        <td class="py-2">{{ att.time_in.strftime('%H:%M:%S') if att.time_in else 'N/A' }}</td>
+                        <td class="py-2">{{ att.time_out.strftime('%H:%M:%S') if att.time_out else 'N/A' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No attendance records found.</p>
+    {% endif %}
+</div>
+<script>
+    async function capturePhoto(formId) {
+        const video = document.createElement('video');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.play();
+        document.body.appendChild(video);
+
+        setTimeout(() => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const photoData = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById(formId).querySelector('input[name="photo"]').value = photoData;
+            document.getElementById(formId).submit();
+            stream.getTracks().forEach(track => track.stop());
+            video.remove();
+        }, 2000);
+    }
+    function updateClock() {
+        const now = new Date();
+        const options = { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        document.getElementById('clock').textContent = now.toLocaleTimeString('en-IN', options);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
+{% endblock %}

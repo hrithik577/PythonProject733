@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Edit Guard - {{ guard.username }}{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Edit Guard - {{ guard.username }}</h1>
+<a href="{{ url_for('view_unit', unit_id=guard.unit_id) }}" class="text-blue-500 hover:underline mb-4 inline-block">Back to Unit</a>
+<div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg card">
+    <form method="POST" onsubmit="return validateEditGuardForm()">
+        <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-200">Username</label>
+            <input type="text" name="username" id="username" value="{{ guard.username }}" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-200">Password (leave blank to keep unchanged)</label>
+            <input type="password" name="password" id="password" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white">
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-200">Unit</label>
+            <select name="unit_id" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+                {% for unit in units %}
+                    <option value="{{ unit.id }}" {% if unit.id == guard.unit_id %}selected{% endif %}>{{ unit.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn-primary w-full p-3 rounded text-white font-semibold">Update Guard</button>
+    </form>
+</div>
+<script>
+    function validateEditGuardForm() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        if (username.length < 3) {
+            alert('Username must be at least 3 characters long');
+            return false;
+        }
+        if (password && password.length < 6) {
+            alert('Password must be at least 6 characters long');
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}View Photos - {{ guard.username }}{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Photos for {{ guard.username }}</h1>
+<a href="{{ url_for('view_unit', unit_id=guard.unit_id
+
+) }}" class="text-blue-500 hover:underline mb-4 inline-block">Back to Unit</a>
+<h2 class="text-xl font-semibold mb-4">Attendance Photos (Last 30 Days)</h2>
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg card mb-6">
+    {% if attendances %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% for att in attendances %}
+                <div>
+                    <p class="text-gray-700 dark:text-gray-200">{{ att.date }}</p>
+                    {% if att.photo_in %}
+                        <img src="{{ url_for('static', filename='uploads/' + att.photo_in) }}" class="w-48 h-48 object-cover mt-2">
+                        <p class="text-sm">Time In: {{ att.time_in.strftime('%H:%M:%S') }}</p>
+                    {% endif %}
+                    {% if att.photo_out %}
+                        <img src="{{ url_for('static', filename='uploads/' + att.photo_out) }}" class="w-48 h-48 object-cover mt-2">
+                        <p class="text-sm">Time Out: {{ att.time_out.strftime('%H:%M:%S') }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No attendance photos available.</p>
+    {% endif %}
+</div>
+<h2 class="text-xl font-semibold mb-4">Hourly Check Photos</h2>
+<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg card">
+    {% if hourly_checks %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% for check in hourly_checks %}
+                <div>
+                    <img src="{{ url_for('static', filename='uploads/' + check.photo) }}" class="w-48 h-48 object-cover">
+                    <p class="text-sm">{{ check.timestamp }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No hourly check photos available.</p>
+    {% endif %}
+</div>
+{% endblock %}

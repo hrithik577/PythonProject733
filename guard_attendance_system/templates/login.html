@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg card">
+    <h1 class="text-2xl font-bold mb-6 text-center">Login</h1>
+    <form method="POST" onsubmit="return validateLoginForm()">
+        <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-200">Username</label>
+            <input type="text" name="username" id="username" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 dark:text-gray-200">Password</label>
+            <input type="password" name="password" id="password" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+        </div>
+        <button type="submit" class="btn-primary w-full p-3 rounded text-white font-semibold">Login</button>
+    </form>
+</div>
+<script>
+    function validateLoginForm() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        if (username.length < 3) {
+            alert('Username must be at least 3 characters long');
+            return false;
+        }
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters long');
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

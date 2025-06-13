@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+        window.onload = () => {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        };
+    </script>
+</head>
+<body class="bg-gray-100">
+    <nav class="navbar p-4 text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Guard Attendance System</h1>
+            <div>
+                {% if session.user_id %}
+                    <a href="{{ url_for('logout') }}" class="text-white hover:text-gray-200 mr-4">Logout</a>
+                {% endif %}
+                <button onclick="toggleDarkMode()" class="bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700">Toggle Dark Mode</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto p-6">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert bg-red-100 p-4 rounded mb-6">
+                    {% for message in messages %}
+                        <p class="text-red-700">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

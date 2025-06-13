@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+{% if missed_photos %}
+    <div class="alert bg-yellow-100 p-4 rounded mb-6">
+        <p class="text-yellow-700">Missed hourly photos from: {{ missed_photos|join(', ') }}</p>
+    </div>
+{% endif %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg card">
+        <h2 class="text-xl font-semibold mb-4">Add Unit</h2>
+        <form method="POST" action="{{ url_for('add_unit') }}" onsubmit="return validateUnitForm()">
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-200">Unit Name</label>
+                <input type="text" name="name" id="unitName" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+            </div>
+            <button type="submit" class="btn-primary w-full p-3 rounded text-white font-semibold">Add Unit</button>
+        </form>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg card">
+        <h2 class="text-xl font-semibold mb-4">Add Guard</h2>
+        <form method="POST" action="{{ url_for('add_guard') }}" onsubmit="return validateGuardForm()">
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-200">Username</label>
+                <input type="text" name="username" id="guardUsername" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-200">Password</label>
+                <input type="password" name="password" id="guardPassword" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-200">Unit</label>
+                <select name="unit_id" class="w-full p-3 border rounded dark:bg-gray-700 dark:text-white" required>
+                    {% for unit in units %}
+                        <option value="{{ unit.id }}">{{ unit.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn-primary w-full p-3 rounded text-white font-semibold">Add Guard</button>
+        </form>
+    </div>
+</div>
+<h2 class="text-xl font-semibold mt-6">Units</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+    {% for unit in units %}
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg card">
+            <h3 class="text-lg font-medium">{{ unit.name }}</h3>
+            <div class="mt-2">
+                <a href="{{ url_for('view_unit', unit_id=unit.id) }}" class="text-blue-500 hover:underline">View Details</a>
+                <a href="{{ url_for('delete_unit', unit_id=unit.id) }}" class="text-red-500 hover:underline ml-4" onclick="return confirm('Are you sure you want to delete this unit?')">Delete</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<script>
+    function validateUnitForm() {
+        const unitName = document.getElementById('unitName').value;
+        if (unitName.length < 3) {
+            alert('Unit name must be at least 3 characters long');
+            return false;
+        }
+        return true;
+    }
+    function validateGuardForm() {
+        const username = document.getElementById('guardUsername').value;
+        const password = document.getElementById('guardPassword').value;
+        if (username.length < 3) {
+            alert('Username must be at least 3 characters long');
+            return false;
+        }
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters long');
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}
